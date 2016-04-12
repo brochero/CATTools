@@ -6,7 +6,16 @@ runOnMC      = True
 # runOnTTbarMC == 1, ttbar Signal
 # runOnTTbarMC == 2, ttbar Background
 runOnTTbarMC = 1
-#------------------------------------------------------------------
+# ttbar Category
+# TTbarCatMC == 0, All ttbar
+# TTbarCatMC == 1, ttbb
+# TTbarCatMC == 2, ttb
+# TTbarCatMC == 3, ttcc
+# TTbarCatMC == 4, ttLF
+# TTbarCatMC == 5, tt 
+# TTbarCatMC == 6, ttjj 
+TTbarCatMC = 0
+#-----------------------------------------------------------------
 #------------------------------------------------------------------
 
 import FWCore.ParameterSet.Config as cms
@@ -25,10 +34,9 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
      fileNames = cms.untracked.vstring(
-        'root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/TT_TuneCUETP8M1_13TeV-powheg-pythia8/v7-6-2_RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1/160211_132614/0000/catTuple_1.root',
+        'file:catTuple_22.root',
         )
 )
-
 # PUReWeight
 # process.load("CATTools.CatProducer.pileupWeight_cff")
 # from CATTools.CatProducer.pileupWeight_cff import pileupWeightMap
@@ -39,8 +47,9 @@ process.source = cms.Source("PoolSource",
 
 # json file (Only Data)
 # ReReco JSON file taken from: https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions15/13TeV/Reprocessing/Cert_13TeV_16Dec2015ReReco_Collisions15_25ns_JSON.txt
+# ReReco JSON file W/O bad beam spot runs taken from: Kike (inclusive Xsec->ll). Lumi= 2.17fb-1
 # import FWCore.PythonUtilities.LumiList as LumiList
-# process.source.lumisToProcess = LumiList.LumiList(filename = 'Cert_13TeV_16Dec2015ReReco_Collisions15_25ns_JSON.txt').getVLuminosityBlockRange()
+# process.source.lumisToProcess = LumiList.LumiList(filename = 'Cert_13TeV_16Dec2015ReReco_Collisions15_25ns_JSON_nobadBeamSpot_json.txt').getVLuminosityBlockRange()
 
 # Lepton SF
 from CATTools.CatAnalyzer.leptonSF_cff import *
@@ -48,9 +57,11 @@ from CATTools.CatAnalyzer.leptonSF_cff import *
 process.ttbbLepJets = cms.EDAnalyzer('ttbbLepJetsAnalyzer',
                                      sampleLabel       = cms.untracked.bool(runOnMC),
                                      TTbarSampleLabel  = cms.untracked.int32(runOnTTbarMC),
+                                     TTbarCatLabel     = cms.untracked.int32(TTbarCatMC),
                                      genWeightLabel    = cms.InputTag("genWeight"),
                                      genLabel          = cms.InputTag("prunedGenParticles"),
                                      genJetLabel       = cms.InputTag("slimmedGenJets"),
+                                     genHiggsCatLabel  = cms.InputTag("GenTtbarCategories:genTtbarId"),
                                      genttbarCatLabel  = cms.InputTag("catGenTops"),
                                      muonLabel         = cms.InputTag("catMuons"),
                                      muonSF            = muonSFTight,
@@ -64,6 +75,7 @@ process.ttbbLepJets = cms.EDAnalyzer('ttbbLepJetsAnalyzer',
                                      puDownWeightLabel = cms.InputTag("pileupWeight:dn"),
                                      triggerBits       = cms.InputTag("TriggerResults::HLT"), 
                                      triggerObjects    = cms.InputTag("catTrigger"), 
+                                     JetMother         = cms.InputTag("genJetHadronFlavour:ancestors"), 
                                      )
 
 process.TFileService = cms.Service("TFileService",
