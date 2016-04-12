@@ -502,26 +502,24 @@ void ttbbLepJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetu
   // Weights for Syst. Scale: ttbar
   //---------------------------------------------------------------------------
   if(TTbarMC_ == 1 ) {
-    edm::Handle<vector<float>> scaleWeight;
-    iEvent.getByToken(ScaleWeightToken_, scaleWeight);
+    edm::Handle<cat::GenWeights> genWeightHandle;
+    iEvent.getByToken(genWeightToken_, genWeightHandle);
 
-    if(scaleWeight->size() > 7){
-      // muR/muF Scale Weights
-      b_ScaleWeight->push_back(genWeightHandle->scaleUpWeights()[0]);   // muR=Nom  muF=Up
-      b_ScaleWeight->push_back(genWeightHandle->scaleDownWeights()[0]); // muR=Nom  muF=Down
-      b_ScaleWeight->push_back(genWeightHandle->scaleUpWeights()[1]);   // muR=Up   muF=Nom
-      b_ScaleWeight->push_back(genWeightHandle->scaleUpWeights()[2]);   // muR=Up   muF=Up
-      b_ScaleWeight->push_back(genWeightHandle->scaleDownWeights()[1]); // muR=Down muF=Nom
-      b_ScaleWeight->push_back(genWeightHandle->scaleDownWeights()[2]); // muR=Down muF=Down
-
-      // Sum of muR/muF Scale Weights
-      EventInfo->Fill(8.5,  b_ScaleWeight->at(0)); 
-      EventInfo->Fill(9.5,  b_ScaleWeight->at(1)); 
-      EventInfo->Fill(10.5, b_ScaleWeight->at(2));
-      EventInfo->Fill(11.5, b_ScaleWeight->at(3));
-      EventInfo->Fill(12.5, b_ScaleWeight->at(4));
-      EventInfo->Fill(13.5, b_ScaleWeight->at(5));
-    }
+    // muR/muF Scale Weights
+    b_ScaleWeight->push_back(genWeightHandle->scaleUpWeights()[0]);   // muR=Nom  muF=Up
+    b_ScaleWeight->push_back(genWeightHandle->scaleDownWeights()[0]); // muR=Nom  muF=Down
+    b_ScaleWeight->push_back(genWeightHandle->scaleUpWeights()[1]);   // muR=Up   muF=Nom
+    b_ScaleWeight->push_back(genWeightHandle->scaleUpWeights()[2]);   // muR=Up   muF=Up
+    b_ScaleWeight->push_back(genWeightHandle->scaleDownWeights()[1]); // muR=Down muF=Nom
+    b_ScaleWeight->push_back(genWeightHandle->scaleDownWeights()[2]); // muR=Down muF=Down
+    
+    // Sum of muR/muF Scale Weights
+    EventInfo->Fill(8.5,  b_ScaleWeight->at(0)); 
+    EventInfo->Fill(9.5,  b_ScaleWeight->at(1)); 
+    EventInfo->Fill(10.5, b_ScaleWeight->at(2));
+    EventInfo->Fill(11.5, b_ScaleWeight->at(3));
+    EventInfo->Fill(12.5, b_ScaleWeight->at(4));
+    EventInfo->Fill(13.5, b_ScaleWeight->at(5));
   }
 
   //---------------------------------------------------------------------------
