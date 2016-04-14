@@ -149,6 +149,7 @@ private:
   std::vector<int> *b_Jet_hadronFlavour;
 
   std::vector<int> *b_Jet_MatchedGenJetIndex;
+  float b_DRAddJets;
 
   // JES and JER
   std::vector<float> *b_Jet_JES_Up;
@@ -317,6 +318,7 @@ ttbbLepJetsAnalyzer::ttbbLepJetsAnalyzer(const edm::ParameterSet& iConfig):
     tree->Branch("scaleweight", "std::vector<float>", &b_ScaleWeight );
     tree->Branch("genhiggscatid", &b_GenHiggsCatID, "genhiggscatid/I");
     tree->Branch("genconecatid" , "std::vector<int>", &b_GenConeCatID);
+    tree->Branch("draddjets",     &b_DRAddJets,       "DRAddJets/F");
     tree->Branch("genchannel",    &b_GenChannel,      "genchannel/I");
     tree->Branch("genlepton_pT",  &b_GenLepton_pT,    "genlepton_pT/F");
     tree->Branch("genlepton_eta", &b_GenLepton_eta,   "genlepton_eta/F");
@@ -335,6 +337,7 @@ ttbbLepJetsAnalyzer::ttbbLepJetsAnalyzer(const edm::ParameterSet& iConfig):
     gentree->Branch("genchannel",    &b_GenChannel,        "genchannel/I");
     gentree->Branch("genhiggscatid", &b_GenHiggsCatID,     "genhiggscatid/I");
     gentree->Branch("genconecatid" , "std::vector<int>",   &b_GenConeCatID);
+    gentree->Branch("draddjets",     &b_DRAddJets,       "DRAddJets/F");
     gentree->Branch("genlepton_pT",  &b_GenLepton_pT,      "genlepton_pT/F");
     gentree->Branch("genlepton_eta", &b_GenLepton_eta,     "genlepton_eta/F");
     gentree->Branch("genjet_px",  "std::vector<float>", &b_GenJet_px);
@@ -563,6 +566,9 @@ void ttbbLepJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetu
     b_GenConeCatID->push_back(genttbarConeCat->begin()-> NaddbJets20());
     // [7]: Number of add c-Jets
     b_GenConeCatID->push_back(genttbarConeCat->begin()-> NaddcJets20());
+
+    // DR between additional Jets
+    b_DRAddJets = genttbarConeCat->begin()->dRaddJets();
 
       if(genttbarConeCat->begin()-> NaddbJets20() > 1){
 	EventInfo->Fill(2.5, 1.0); // Number of ttbb Events	
