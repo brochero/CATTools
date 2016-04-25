@@ -160,6 +160,10 @@ private:
   // b-Jet discriminant
   std::vector<float> *b_Jet_CSV;
   std::vector<float> *b_Jet_SF_CSV;
+  // c-Jet discriminant
+  std::vector<float> *b_Jet_iCSVCvsL;
+  std::vector<float> *b_Jet_CCvsLT;
+  std::vector<float> *b_Jet_CCvsBT;
 
   //---------------------------------------------------------------------------
   //---------------------------------------------------------------------------
@@ -251,6 +255,10 @@ ttbbLepJetsAnalyzer::ttbbLepJetsAnalyzer(const edm::ParameterSet& iConfig):
   b_Jet_Index= new std::vector<int>;
   b_Jet_pT   = new std::vector<float>;
   b_Jet_CSV  = new std::vector<float>;
+
+  b_Jet_iCSVCvsL = new std::vector<float>;
+  b_Jet_CCvsLT   = new std::vector<float>;
+  b_Jet_CCvsBT   = new std::vector<float>;
   
   b_Jet_partonFlavour = new std::vector<int>;
   b_Jet_hadronFlavour = new std::vector<int>;
@@ -300,6 +308,12 @@ ttbbLepJetsAnalyzer::ttbbLepJetsAnalyzer(const edm::ParameterSet& iConfig):
 
   tree->Branch("jet_CSV" ,   "std::vector<float>", &b_Jet_CSV );
   tree->Branch("jet_SF_CSV", "std::vector<float>", &b_Jet_SF_CSV );
+
+  tree->Branch("jet_SF_CSV", "std::vector<float>", &b_Jet_SF_CSV );
+
+  tree->Branch("jet_iCSVCvsL", "std::vector<float>", &b_Jet_iCSVCvsL );
+  tree->Branch("jet_CCvsLT",   "std::vector<float>", &b_Jet_CCvsLT );
+  tree->Branch("jet_CCvBLT",   "std::vector<float>", &b_Jet_CCvsBT );
 
   tree->Branch("jet_Number" , &b_Jet_Number, "jet_number/I" );
 
@@ -404,6 +418,10 @@ ttbbLepJetsAnalyzer::~ttbbLepJetsAnalyzer()
 
   delete b_Jet_SF_CSV;
 
+  delete b_Jet_iCSVCvsL;
+  delete b_Jet_CCvsLT;
+  delete b_Jet_CCvsBT;
+
   delete b_Jet_CSV;
 
 }
@@ -452,6 +470,10 @@ void ttbbLepJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetu
 
   b_Jet_CSV->clear();
   b_Jet_SF_CSV->clear();
+
+  b_Jet_iCSVCvsL->clear();
+  b_Jet_CCvsLT  ->clear();
+  b_Jet_CCvsBT  ->clear();
 
   //---------------------------------------------------------------------------
   //---------------------------------------------------------------------------
@@ -904,6 +926,13 @@ void ttbbLepJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetu
         // b-tag discriminant
         float jet_btagDis_CSV = jet.bDiscriminator(BTAG_CSVv2);
         b_Jet_CSV ->push_back(jet_btagDis_CSV);
+        // c-tag discriminant
+        float jet_btagDis_iCSVCvsL = jet.bDiscriminator("inclusiveCandidateSecondaryVerticesCvsL");
+        b_Jet_iCSVCvsL ->push_back(jet_btagDis_iCSVCvsL);
+        float jet_btagDis_CCvsLT = jet.bDiscriminator("pfCombinedCvsLJetTags");
+        b_Jet_CCvsLT ->push_back(jet_btagDis_CCvsLT);
+        float jet_btagDis_CCvsBT = jet.bDiscriminator("pfCombinedCvsBJetTags");
+        b_Jet_CCvsBT ->push_back(jet_btagDis_CCvsBT);
 
         if(isMC_) {
           // JES
