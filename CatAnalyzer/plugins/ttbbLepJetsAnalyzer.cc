@@ -309,11 +309,9 @@ ttbbLepJetsAnalyzer::ttbbLepJetsAnalyzer(const edm::ParameterSet& iConfig):
   tree->Branch("jet_CSV" ,   "std::vector<float>", &b_Jet_CSV );
   tree->Branch("jet_SF_CSV", "std::vector<float>", &b_Jet_SF_CSV );
 
-  tree->Branch("jet_SF_CSV", "std::vector<float>", &b_Jet_SF_CSV );
-
   tree->Branch("jet_iCSVCvsL", "std::vector<float>", &b_Jet_iCSVCvsL );
   tree->Branch("jet_CCvsLT",   "std::vector<float>", &b_Jet_CCvsLT );
-  tree->Branch("jet_CCvBLT",   "std::vector<float>", &b_Jet_CCvsBT );
+  tree->Branch("jet_CCvsBT",   "std::vector<float>", &b_Jet_CCvsBT );
 
   tree->Branch("jet_Number" , &b_Jet_Number, "jet_number/I" );
 
