@@ -4,8 +4,8 @@ import os, time, socket, sys
 UserName       = os.environ["USER"]
 BaseDir        = os.environ["CMSSW_BASE"]+"/src"
 InputDB        = str(sys.argv[1])
-FileHeader     = "Tree_LepJets_Cat_v8-0-4_Spring16-80X_36814pb-1"
-OutputLocation = "/xrootd/store/user/brochero/v8-0-4/"
+FileHeader     = "Tree_LepJets_Final_v8-0-6_Spring16-80X_36814pb-1"
+OutputLocation = "/xrootd/store/user/brochero/v8-0-6/"
 
 DelayTime = 120. # Time in seconds
 maxNjobs = 2000  # Maximum number of jobs running simultaneously
@@ -66,7 +66,7 @@ for line in fr:
         tempsn = line.rstrip().split()
         if len(tempsn) > 1:
             SamNam.append(str(tempsn[0]))
-            SamLoc.append(BaseDir+"/CATTools/CatAnalyzer/data/dataset_v8-0-4/"+str(tempsn[1]))
+            SamLoc.append(BaseDir+"/CATTools/CatAnalyzer/data/dataset_v8-0-6/"+str(tempsn[1]))
             tSamArg = ""
             if len(tempsn) > 2:
                 for narg in range(2, len(tempsn)):
@@ -77,11 +77,11 @@ for line in fr:
             quit()
         del tempsn
         nfSamLoc = NumberOfFiles (SamLoc[nsrunning])
-        if nfSamLoc < 500: maxf = 1
-        else:              maxf =  int(round(nfSamLoc/500.))    
+        if nfSamLoc < 200: maxf = 1
+        else:              maxf =  int(round(nfSamLoc/200.))    
 
         print  str(nfSamLoc) + " root files. Max number of files per job " + str(maxf)  
-        CreateJob = str("./create-batch --jobName " + SamNam[nsrunning] + " --fileList " + SamLoc[nsrunning] + " --maxFiles " + str(maxf) + " --cfg ttbbLepJetsAnalyzer_cfg.py --queue batch6")
+        CreateJob = str("create-batch --jobName " + SamNam[nsrunning] + " --fileList " + SamLoc[nsrunning] + " --maxFiles " + str(maxf) + " --cfg ttbbLepJetsAnalyzer_cfg.py --queue batch6")
         if SamArg[nsrunning] is not "":
             CreateJob += " --args ' " + SamArg[nsrunning] + " ' "
         print CreateJob
@@ -126,7 +126,7 @@ for line in fr:
                         print "Creating " + BackupDir
                         os.system("mkdir " + BackupDir)
                     print "Moving " + SamNam[index] + " directory to " + BackupDir
-                    os.system("mv " + SamNam[index] + "  " + BackupDir)
+                    #os.system("mv " + SamNam[index] + "  " + BackupDir)
                     print "Files kept in the BackupFiles directory!! Delete them your self! "
                 nsrunning = 0
                 jobsRunning = False
