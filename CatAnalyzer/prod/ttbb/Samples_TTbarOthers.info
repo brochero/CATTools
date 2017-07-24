@@ -7,6 +7,10 @@ ttbar_PowhegHerwig           dataset_TT_powheg_herwig.txt           runOnTTbarMC
 ttbar_PowhegHerwigttbb       dataset_TT_powheg_herwig.txt           runOnTTbarMC=1 TTbarCatMC=1
 ttbar_PowhegHerwigttjj       dataset_TT_powheg_herwig.txt           runOnTTbarMC=1 TTbarCatMC=6
 
+ttbar_aMCatNLOPythia           dataset_TTJets_aMC.txt           runOnTTbarMC=1 TTbarCatMC=0
+ttbar_aMCatNLOPythiattbb       dataset_TTJets_aMC.txt           runOnTTbarMC=1 TTbarCatMC=1
+ttbar_aMCatNLOPythiattjj       dataset_TTJets_aMC.txt           runOnTTbarMC=1 TTbarCatMC=6
+
 ttbar_PowhegPythiattbb_SYS_Central     dataset_TT_powheg.txt                  runOnTTbarMC=1 TTbarCatMC=1
 ttbar_PowhegPythiattjj_SYS_Central     dataset_TT_powheg.txt                  runOnTTbarMC=1 TTbarCatMC=6
 
@@ -27,10 +31,3 @@ ttbar_PowhegPythiattjj_SYS_FSR_Down     dataset_TT_powheg_FSRdown.txt           
 
 ttbar_LepJetsPowhegPythiattbb_SYS_Central dataset_TTLJ_powheg.txt     runOnTTbarMC=1 TTbarCatMC=1
 ttbar_LepJetsPowhegPythiattjj_SYS_Central dataset_TTLJ_powheg.txt     runOnTTbarMC=1 TTbarCatMC=6
-
-ttbar_LepJetsPowhegPythiattbb_SYS_Scale_Down dataset_TTLJ_powheg_scaledown.txt     runOnTTbarMC=1 TTbarCatMC=1
-ttbar_LepJetsPowhegPythiattjj_SYS_Scale_Down dataset_TTLJ_powheg_scaledown.txt     runOnTTbarMC=1 TTbarCatMC=6
-
-ttbar_LepJetsPowhegPythiattbb_SYS_AlphaS dataset_TTLJ_powheg_alphaS.txt     runOnTTbarMC=1 TTbarCatMC=1
-ttbar_LepJetsPowhegPythiattjj_SYS_AlphaS dataset_TTLJ_powheg_alphaS.txt     runOnTTbarMC=1 TTbarCatMC=6
-
