@@ -39,7 +39,8 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 // Kinematic Reconstruction
-#include "CATTools/CatAnalyzer/interface/LepJets_Fitter.h"
+#include "CATTools/CatAnalyzer/interface/LepJetsFitter.h"
+#include "CATTools/CatAnalyzer/interface/LepJetsFitterFCNH.h"
 
 #include "TH1.h"
 #include "TTree.h"
@@ -164,6 +165,18 @@ private:
   std::vector<float> *b_GenJet_eta;
   std::vector<float> *b_GenJet_phi;
   std::vector<float> *b_GenJet_E;
+
+  // additional b jets 
+  float b_addbjet1_pt; 
+  float b_addbjet1_eta; 
+  float b_addbjet1_phi; 
+  float b_addbjet1_e; 
+
+  float b_addbjet2_pt;
+  float b_addbjet2_eta;
+  float b_addbjet2_phi;
+  float b_addbjet2_e; 
+
   // Jet Mother (MC Studies)
   std::vector<int> *b_GenJet_mom, *b_GenJet_GenConeMom;
   // Jets
@@ -209,6 +222,22 @@ private:
   std::vector<float> *b_KinJet_E;
 
   std::vector<int>   *b_KinJet_Index;
+
+  // Kinematic Reconstruction for FCNH
+  float b_fcnhKin_Chi2;
+
+  // KR Leptons
+  float b_fcnhKinNu_pT;
+  float b_fcnhKinNu_eta;
+  float b_fcnhKinNu_phi;
+  float b_fcnhKinNu_E;
+  // KR Jets
+  std::vector<float> *b_fcnhKinJet_pT;
+  std::vector<float> *b_fcnhKinJet_eta;
+  std::vector<float> *b_fcnhKinJet_phi;
+  std::vector<float> *b_fcnhKinJet_E;
+
+  std::vector<int>   *b_fcnhKinJet_Index;
 
 
   //---------------------------------------------------------------------------
@@ -347,6 +376,15 @@ ttbbLepJetsAnalyzer::ttbbLepJetsAnalyzer(const edm::ParameterSet& iConfig):
 
   b_KinJet_Index = new std::vector<int>;
 
+  // Kinematic Reconstruction for FCNH
+  b_fcnhKinJet_pT  = new std::vector<float>;
+  b_fcnhKinJet_eta = new std::vector<float>;
+  b_fcnhKinJet_phi = new std::vector<float>;
+  b_fcnhKinJet_E   = new std::vector<float>;
+
+  b_fcnhKinJet_Index = new std::vector<int>;
+
+
 
   usesResource("TFileService");
   edm::Service<TFileService> fs;
@@ -412,7 +450,20 @@ ttbbLepJetsAnalyzer::ttbbLepJetsAnalyzer(const edm::ParameterSet& iConfig):
   tree->Branch("kinjet_phi",   "std::vector<float>", &b_KinJet_phi);
   tree->Branch("kinjet_E",     "std::vector<float>", &b_KinJet_E);
   tree->Branch("kinjet_index", "std::vector<int>",   &b_KinJet_Index);
-  
+ 
+  // Kinematic Reconstruction for FCNH
+  tree->Branch("fcnhkin_chi2",   &b_fcnhKin_Chi2,  "fcnhkin_chi2/F");
+  tree->Branch("fcnhkinnu_pT",   &b_fcnhKinNu_pT,  "fcnhkinnu_pT/F");
+  tree->Branch("fcnhkinnu_eta",  &b_fcnhKinNu_eta, "fcnhkinnu_eta/F");
+  tree->Branch("fcnhkinnu_phi",  &b_fcnhKinNu_phi, "fcnhkinnu_phi/F");
+  tree->Branch("fcnhkinnu_E",    &b_fcnhKinNu_E,   "fcnhkinnu_E/F");
+
+  tree->Branch("fcnhkinjet_pT",    "std::vector<float>", &b_fcnhKinJet_pT);
+  tree->Branch("fcnhkinjet_eta",   "std::vector<float>", &b_fcnhKinJet_eta);
+  tree->Branch("fcnhkinjet_phi",   "std::vector<float>", &b_fcnhKinJet_phi);
+  tree->Branch("fcnhkinjet_E",     "std::vector<float>", &b_fcnhKinJet_E);
+  tree->Branch("fcnhkinjet_index", "std::vector<int>",   &b_fcnhKinJet_Index);
+
   // GEN Variables (only ttbarSignal)
   if(TTbarMC_ == 1){
     tree->Branch("pdfweight",   "std::vector<float>", &b_PDFWeight );
@@ -428,8 +479,8 @@ ttbbLepJetsAnalyzer::ttbbLepJetsAnalyzer(const edm::ParameterSet& iConfig):
     tree->Branch("gencone_gjetIndex" , "std::vector<int>",   &b_GenCone_gJetIndex);
     tree->Branch("gencone_gJetFlavW" , "std::vector<int>",   &b_GenCone_gJetFlavW);
 
-    tree->Branch("gencone_NgjetsW", &b_GenCone_NgJetsW, "b_GenCone_NgJetsW/I");
-    tree->Branch("draddjets",       &b_DRAddJets,       "DRAddJets/F");
+    tree->Branch("gencone_NgjetsW", &b_GenCone_NgJetsW, "gencone_NgjetsW/I");
+    tree->Branch("draddjets",       &b_DRAddJets,       "draddjets/F");
     tree->Branch("genhiggscatid",   &b_GenHiggsCatID,   "genhiggscatid/I");
 
     tree->Branch("genchannel",    &b_GenChannel,    "genchannel/I");
@@ -449,6 +500,16 @@ ttbbLepJetsAnalyzer::ttbbLepJetsAnalyzer(const edm::ParameterSet& iConfig):
     tree->Branch("genjet_mom", "std::vector<int>",   &b_GenJet_mom);
 
     tree->Branch("genjet_gencone_mom", "std::vector<int>",  &b_GenJet_GenConeMom);
+
+    tree->Branch("addbjet1_pt", &b_addbjet1_pt, "addbjet1_pt/F"); 
+    tree->Branch("addbjet1_eta", &b_addbjet1_eta, "addbjet1_eta/F"); 
+    tree->Branch("addbjet1_phi", &b_addbjet1_phi, "addbjet1_phi/F"); 
+    tree->Branch("addbjet1_e", &b_addbjet1_e, "addbjet1_e/F"); 
+
+    tree->Branch("addbjet2_pt", &b_addbjet2_pt, "addbjet2_pt/F");
+    tree->Branch("addbjet2_eta", &b_addbjet2_eta, "addbjet2_eta/F");
+    tree->Branch("addbjet2_phi", &b_addbjet2_phi, "addbjet2_phi/F");
+    tree->Branch("addbjet2_e", &b_addbjet2_e, "addbjet2_e/F");  
 
     //GEN TREE
     gentree = fs->make<TTree>("gentree", "TopGENTree");
@@ -551,6 +612,14 @@ ttbbLepJetsAnalyzer::~ttbbLepJetsAnalyzer()
   
   delete b_KinJet_Index;
 
+  delete b_fcnhKinJet_pT;
+  delete b_fcnhKinJet_eta;
+  delete b_fcnhKinJet_phi;
+  delete b_fcnhKinJet_E;
+ 
+  delete b_fcnhKinJet_Index;
+
+
 }
 
 //
@@ -617,6 +686,23 @@ void ttbbLepJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetu
   b_KinJet_E  ->clear();
   
   b_KinJet_Index->clear();
+
+  b_fcnhKinJet_pT ->clear();
+  b_fcnhKinJet_eta->clear();
+  b_fcnhKinJet_phi->clear();
+  b_fcnhKinJet_E  ->clear();
+ 
+  b_fcnhKinJet_Index->clear();
+
+  b_addbjet1_pt = -1.0;
+  b_addbjet1_eta = -1.0;
+  b_addbjet1_phi = -1.0;
+  b_addbjet1_e = -1.0;
+
+  b_addbjet2_pt = -1.0;
+  b_addbjet2_eta = -1.0;
+  b_addbjet2_phi = -1.0;
+  b_addbjet2_e = -1.0;
 
   //---------------------------------------------------------------------------
   //---------------------------------------------------------------------------
@@ -765,6 +851,17 @@ void ttbbLepJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetu
       b_GenCone_gJet_phi ->push_back(gJetGenCone[ijGT].Phi());
       b_GenCone_gJet_E   ->push_back(gJetGenCone[ijGT].E());
     }
+
+    // adding additional b jet four-momentum
+    b_addbjet1_pt = genttbarConeCat->begin()->addbJets1().Pt();
+    b_addbjet1_eta = genttbarConeCat->begin()->addbJets1().Eta();
+    b_addbjet1_phi = genttbarConeCat->begin()->addbJets1().Phi();
+    b_addbjet1_e = genttbarConeCat->begin()->addbJets1().E();
+
+    b_addbjet2_pt = genttbarConeCat->begin()->addbJets2().Pt();
+    b_addbjet2_eta = genttbarConeCat->begin()->addbJets2().Eta();
+    b_addbjet2_phi = genttbarConeCat->begin()->addbJets2().Phi();
+    b_addbjet2_e = genttbarConeCat->begin()->addbJets2().E();
 
     // DR 
     b_DRAddJets = genttbarConeCat->begin()->dRaddJets();
@@ -1246,6 +1343,8 @@ void ttbbLepJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetu
     iEvent.getByToken(CSVSysWeightToken_, rsysSF_CSV);
     for (unsigned int icsv = 0; icsv < rsysSF_CSV->size() ; icsv++)  Jet_SF_CSV[4][icsv+1] = rsysSF_CSV->at(icsv); 
 
+    std::vector<cat::Jet> selectedJets;
+
     // Run again over all Jets (CSV order)
     for (unsigned int i = 0; i < JetIndex.size() ; i++) {
 
@@ -1263,6 +1362,7 @@ void ttbbLepJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetu
       if(dr_LepJet > 0.4) cleanJet = true;
 
       if(goodJet && cleanJet){
+        selectedJets.push_back( jet );
         // Basic variables
         b_Jet_pT ->push_back(jet.pt());
         b_Jet_eta->push_back(jet.eta());
@@ -1360,7 +1460,7 @@ void ttbbLepJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetu
       (*b_Jet_SF_CSV_40)[iu] = std::abs(Jet_SF_CSV[3][iu] - Jet_SF_CSV[3][0]) ; // Syst. Unc.
       (*b_Jet_SF_CSV   )[iu] = std::abs(Jet_SF_CSV[4][iu] - Jet_SF_CSV[4][0]) ; // Syst. Unc.
     }
-    
+   
     //---------------------------------------------------------------------------
     // Kinematic Reconstruction
     //---------------------------------------------------------------------------
@@ -1395,7 +1495,7 @@ void ttbbLepJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetu
 	KinJets.push_back(kjet);
       }
       
-      FindHadronicTop(KinLep, KinJets, KinMET, KFUsebtag_, CSVPosConKF_, KinBestIndices, bestchi2, Kinnu, Kinblrefit, Kinbjrefit, Kinj1refit, Kinj2refit);
+      ttbb::FindHadronicTop(KinLep, KinJets, KinMET, KFUsebtag_, CSVPosConKF_, KinBestIndices, bestchi2, Kinnu, Kinblrefit, Kinbjrefit, Kinj1refit, Kinj2refit);
       
       // for (unsigned int iin =0; iin<KinBestIndices.size(); iin++) std::cout << KinBestIndices.at(iin) << std::endl;
       // std::cout << "Best Chi2 = " << bestchi2 << std::endl;
@@ -1444,7 +1544,70 @@ void ttbbLepJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetu
     for(unsigned int iki=0; iki<KinBestIndices.size(); iki++) b_KinJet_Index->push_back(KinBestIndices.at(iki));
     
     b_Kin_Chi2 = bestchi2;
-        
+    
+    //FCNC reconstruction
+    //---------------------------------------------------------------------------
+    // Kinematic Reconstruction
+    //---------------------------------------------------------------------------
+    TLorentzVector fcnhKinnu;
+    TLorentzVector fcnhKinblrefit;
+    TLorentzVector fcnhKinbjrefit;
+    TLorentzVector fcnhKinj1refit;
+    TLorentzVector fcnhKinj2refit;
+
+    fcnhKinnu.SetPtEtaPhiE(0,0,0,0);
+    fcnhKinblrefit.SetPtEtaPhiE(0,0,0,0);
+    fcnhKinbjrefit.SetPtEtaPhiE(0,0,0,0);
+    fcnhKinj1refit.SetPtEtaPhiE(0,0,0,0);
+    fcnhKinj2refit.SetPtEtaPhiE(0,0,0,0);
+   
+    std::vector<int> fcnhKinBestIndices;
+    fcnhKinBestIndices.push_back(-999);
+    fcnhKinBestIndices.push_back(-999);
+    fcnhKinBestIndices.push_back(-999);
+    fcnhKinBestIndices.push_back(-999);
+    float bestchi2_fcnh = 0;
+
+    if(N_GoodJets > 3){
+
+      TLorentzVector fcnhKinMET;
+      fcnhKinMET.SetPtEtaPhiE(b_MET, 0.0, b_MET_phi, b_MET);
+
+      fcnh::FindHadronicTop(lepton, selectedJets, fcnhKinMET, KFUsebtag_, CSVPosConKF_, fcnhKinBestIndices, bestchi2_fcnh, fcnhKinnu, fcnhKinblrefit, fcnhKinbjrefit, fcnhKinj1refit, fcnhKinj2refit);
+
+    } //if(N_GoodJets > 3)   
+
+    // LorentzVector for Jets. Same order as fcnhKinBestIndices
+    b_fcnhKinJet_pT->push_back(fcnhKinbjrefit.Pt());
+    b_fcnhKinJet_pT->push_back(fcnhKinj1refit.Pt());
+    b_fcnhKinJet_pT->push_back(fcnhKinj2refit.Pt());
+    b_fcnhKinJet_pT->push_back(fcnhKinblrefit.Pt());
+
+    b_fcnhKinJet_eta->push_back(fcnhKinbjrefit.Eta());
+    b_fcnhKinJet_eta->push_back(fcnhKinj1refit.Eta());
+    b_fcnhKinJet_eta->push_back(fcnhKinj2refit.Eta());
+    b_fcnhKinJet_eta->push_back(fcnhKinblrefit.Eta());
+
+    b_fcnhKinJet_phi->push_back(fcnhKinbjrefit.Phi());
+    b_fcnhKinJet_phi->push_back(fcnhKinj1refit.Phi());
+    b_fcnhKinJet_phi->push_back(fcnhKinj2refit.Phi());
+    b_fcnhKinJet_phi->push_back(fcnhKinblrefit.Phi());
+
+    b_fcnhKinJet_E->push_back(fcnhKinbjrefit.E());
+    b_fcnhKinJet_E->push_back(fcnhKinj1refit.E());
+    b_fcnhKinJet_E->push_back(fcnhKinj2refit.E());
+    b_fcnhKinJet_E->push_back(fcnhKinblrefit.E());
+
+    b_fcnhKinNu_pT  = fcnhKinnu.Pt();
+    b_fcnhKinNu_eta = fcnhKinnu.Eta();
+    b_fcnhKinNu_phi = fcnhKinnu.Phi();
+    b_fcnhKinNu_E   = fcnhKinnu.E();
+
+    for(unsigned int iki=0; iki<fcnhKinBestIndices.size(); iki++) b_fcnhKinJet_Index->push_back(fcnhKinBestIndices.at(iki));
+
+    b_fcnhKin_Chi2 = bestchi2_fcnh;
+    //FCNC reconstruction end
+    
     //---------------------------------------------------------------------------
     //---------------------------------------------------------------------------
     // Fill Tree with event at 1 lepton cut level
