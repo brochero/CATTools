@@ -1,0 +1,31 @@
+# -- TTbar Inclusive
+ttbar_PowhegPythiaEvt        dataset_TT_powheg_evtgen.txt           runOnTTbarMC=1 TTbarCatMC=0
+ttbar_PowhegPythiaEvtttbb    dataset_TT_powheg_evtgen.txt           runOnTTbarMC=1 TTbarCatMC=1
+ttbar_PowhegPythiaEvtttbj    dataset_TT_powheg_evtgen.txt           runOnTTbarMC=1 TTbarCatMC=2
+ttbar_PowhegPythiaEvtttcc    dataset_TT_powheg_evtgen.txt           runOnTTbarMC=1 TTbarCatMC=3
+ttbar_PowhegPythiaEvtttLF    dataset_TT_powheg_evtgen.txt           runOnTTbarMC=1 TTbarCatMC=4
+ttbar_PowhegPythiaEvttt      dataset_TT_powheg_evtgen.txt           runOnTTbarMC=1 TTbarCatMC=5
+ttbar_PowhegPythiaEvtttjj    dataset_TT_powheg_evtgen.txt           runOnTTbarMC=1 TTbarCatMC=6
+
+ttbar_PowhegHerwig           dataset_TT_powheg_herwig.txt           runOnTTbarMC=1 TTbarCatMC=0
+ttbar_PowhegHerwigttbb       dataset_TT_powheg_herwig.txt           runOnTTbarMC=1 TTbarCatMC=1
+ttbar_PowhegHerwigttbj       dataset_TT_powheg_herwig.txt           runOnTTbarMC=1 TTbarCatMC=2
+ttbar_PowhegHerwigttcc       dataset_TT_powheg_herwig.txt           runOnTTbarMC=1 TTbarCatMC=3
+ttbar_PowhegHerwigttLF       dataset_TT_powheg_herwig.txt           runOnTTbarMC=1 TTbarCatMC=4
+ttbar_PowhegHerwigtt         dataset_TT_powheg_herwig.txt           runOnTTbarMC=1 TTbarCatMC=5
+ttbar_PowhegHerwigttjj       dataset_TT_powheg_herwig.txt           runOnTTbarMC=1 TTbarCatMC=6
+
+ttbar_aMCatNLOPythia           dataset_TTJets_aMC.txt           runOnTTbarMC=1 TTbarCatMC=0
+ttbar_aMCatNLOPythiattbb       dataset_TTJets_aMC.txt           runOnTTbarMC=1 TTbarCatMC=1
+ttbar_aMCatNLOPythiattbj       dataset_TTJets_aMC.txt           runOnTTbarMC=1 TTbarCatMC=2
+ttbar_aMCatNLOPythiattcc       dataset_TTJets_aMC.txt           runOnTTbarMC=1 TTbarCatMC=3
+ttbar_aMCatNLOPythiattLF       dataset_TTJets_aMC.txt           runOnTTbarMC=1 TTbarCatMC=4
+ttbar_aMCatNLOPythiatt         dataset_TTJets_aMC.txt           runOnTTbarMC=1 TTbarCatMC=5
+ttbar_aMCatNLOPythiattjj       dataset_TTJets_aMC.txt           runOnTTbarMC=1 TTbarCatMC=6
+
+ttbar_PowhegPythiattbb_SYS_Central     dataset_TT_powheg.txt                  runOnTTbarMC=1 TTbarCatMC=1
+ttbar_PowhegPythiattbj_SYS_Central     dataset_TT_powheg.txt                  runOnTTbarMC=1 TTbarCatMC=2
+ttbar_PowhegPythiattcc_SYS_Central     dataset_TT_powheg.txt                  runOnTTbarMC=1 TTbarCatMC=3
+ttbar_PowhegPythiattLF_SYS_Central     dataset_TT_powheg.txt                  runOnTTbarMC=1 TTbarCatMC=4
+ttbar_PowhegPythiatt_SYS_Central       dataset_TT_powheg.txt                  runOnTTbarMC=1 TTbarCatMC=5
+ttbar_PowhegPythiattjj_SYS_Central     dataset_TT_powheg.txt                  runOnTTbarMC=1 TTbarCatMC=6

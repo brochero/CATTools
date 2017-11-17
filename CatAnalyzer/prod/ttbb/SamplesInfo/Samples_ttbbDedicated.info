@@ -1,0 +1,11 @@
+ttbar_LepJetsPowhegPythiattbbFilterttbb   dataset_TTLJ_powheg_ttbbFilter.txt   runOnTTbarMC=1 TTbarCatMC=1
+ttbar_LepJetsPowhegPythiattbbFilter       dataset_TTLJ_powheg_ttbbFilter.txt   runOnTTbarMC=1 TTbarCatMC=0
+
+ttbb_aMCatNLOttbb                         dataset_TTBB_amcatnlo_4FS_ckm.txt    runOnTTbarMC=1 TTbarCatMC=1
+ttbb_aMCatNLO                             dataset_TTBB_amcatnlo_4FS_ckm.txt    runOnTTbarMC=1 TTbarCatMC=0
+
+ttbb_Sherpattbb                           dataset_TTBB_sherpa_OpenLoops.txt    runOnTTbarMC=1 TTbarCatMC=1
+ttbb_Sherpa                               dataset_TTBB_sherpa_OpenLoops.txt    runOnTTbarMC=1 TTbarCatMC=0
+
+
+
