@@ -4,17 +4,21 @@ import os, time, socket, sys
 UserName       = os.environ["USER"]
 BaseDir        = os.environ["CMSSW_BASE"]+"/src"
 InputDB        = str(sys.argv[1])
-FileHeader     = "Tree_LepJets_Final_v8-0-6_Spring16-80X_36814pb-1"
+FileHeader     = "Tree_LepJets_FallSkim_v8-0-6_Spring16-80X_36814pb-1"
 OutputLocation = "/xrootd/store/user/brochero/v8-0-6/"
 
 DelayTime = 120. # Time in seconds
-maxNjobs = 2000  # Maximum number of jobs running simultaneously
+maxNjobs = 6000  # Maximum number of jobs running simultaneously
+
+def IsValidFile(fpath):  
+    return os.path.isfile(fpath) and os.path.getsize(fpath) > 0
 
 def NumberOfCondorJobs (str):
     condorNF = ".tempCondor_" + socket.gethostname() + "_" + str + "_" + time.strftime('%Hh%Mm%Ss') + ".info"
     print "condor_q %s > %s" % (UserName, condorNF)
     os.system("condor_q %s > %s" % (UserName, condorNF))
-    if not os.path.isfile(condorNF):
+    
+    if not IsValidFile(condorNF):
         condorJobsRun = 1000 # If it cannot read it returs 1000 jobs!
     else:
         with open(condorNF, "rb") as fcondor:
@@ -28,6 +32,7 @@ def NumberOfCondorJobs (str):
             else: condorJobsRun = 1000 # If it cannot read it returs 1000 jobs!
         print "rm -rf " + condorNF
         os.system("rm -rf " + condorNF)
+
     return condorJobsRun;
 
 def NumberOfFiles (str):
@@ -66,7 +71,7 @@ for line in fr:
         tempsn = line.rstrip().split()
         if len(tempsn) > 1:
             SamNam.append(str(tempsn[0]))
-            SamLoc.append(BaseDir+"/CATTools/CatAnalyzer/data/dataset_v8-0-6/"+str(tempsn[1]))
+            SamLoc.append(BaseDir+"/CATTools/CatAnalyzer/data/dataset/"+str(tempsn[1]))
             tSamArg = ""
             if len(tempsn) > 2:
                 for narg in range(2, len(tempsn)):
@@ -81,7 +86,7 @@ for line in fr:
         else:              maxf =  int(round(nfSamLoc/200.))    
 
         print  str(nfSamLoc) + " root files. Max number of files per job " + str(maxf)  
-        CreateJob = str("create-batch --jobName " + SamNam[nsrunning] + " --fileList " + SamLoc[nsrunning] + " --maxFiles " + str(maxf) + " --cfg ttbbLepJetsAnalyzer_cfg.py --queue batch6")
+        CreateJob = str("create-batch --jobName " + SamNam[nsrunning] + " --fileList " + SamLoc[nsrunning] + " --maxFiles " + str(maxf) + " --cfg ttbbAnalyzer_cfg.py --queue batch6")
         if SamArg[nsrunning] is not "":
             CreateJob += " --args ' " + SamArg[nsrunning] + " ' "
         print CreateJob
