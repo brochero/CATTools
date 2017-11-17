@@ -55,7 +55,9 @@ void BTagWeightEvaluator::initCSVWeight(const bool useCSVHelper, const string bt
     string csvFileName;
     if      ( btagName == "csvv2" ) {
       btagAlgo_ = BTAG_CSVv2 ;
-      csvFileName = "CSVv2_Moriond17_B_H.csv";
+      // csvFileName = "CSVv2_Moriond17_B_H.csv";
+      // Latest recommendation from Wuming Luo ``(/afs/cern.ch/user/l/lwming/public/)
+      csvFileName = "ttH_BTV_CSVv2_13TeV_2016All_2017_3_30.csv";
     }
     else if ( btagName == "mva" ) {
       btagAlgo_ = BTAG_cMVAv2;
@@ -93,7 +95,8 @@ void BTagWeightEvaluator::init(const int method,
   string csvFileName;
   if      ( btagName == "csvv2" ) {
     btagAlgo_ = BTAG_CSVv2 ;
-    csvFileName = "CSVv2_Moriond17_B_H.csv";
+    //csvFileName = "CSVv2_Moriond17_B_H.csv";
+    csvFileName = "ttH_BTV_CSVv2_13TeV_2016All_2017_3_30.csv";
   }
   else if ( btagName == "mva" ) {
     btagAlgo_ = BTAG_cMVAv2;

@@ -35,7 +35,8 @@ CSVWeightProducer::CSVWeightProducer(const edm::ParameterSet& pset):
   auto csvFileNameLF = pset.getParameter<std::string>("csvSFLF");
   auto csvFileHF = edm::FileInPath("CATTools/CatAnalyzer/data/scaleFactors/"+csvFileNameHF).fullPath();
   auto csvFileLF = edm::FileInPath("CATTools/CatAnalyzer/data/scaleFactors/"+csvFileNameLF).fullPath();
-  std::cout << csvFileLF << std::endl;
+  std::cout << "HF Root-File: " << csvFileHF << std::endl;
+  std::cout << "LF Root-File: " << csvFileLF << std::endl;
   helper_.reset(new CSVHelper(csvFileHF, csvFileLF));
 
   produces<float>();

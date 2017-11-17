@@ -43,24 +43,21 @@ CSVHelper::CSVHelper(std::string hf, std::string lf, int nHFptBins_):nHFptBins(n
 void
 CSVHelper::fillCSVHistos(TFile *fileHF, TFile *fileLF)
 {
-    for (int iSys = 0; iSys < 9; iSys++) {
-        for (int iPt = 0; iPt < 5; iPt++)
-            h_csv_wgt_hf[iSys][iPt] = NULL;
-        for (int iPt = 0; iPt < 3; iPt++) {
-            for (int iEta = 0; iEta < 3; iEta++)
-                h_csv_wgt_lf[iSys][iPt][iEta] = NULL;
-        }
+  for (int iSys = 0; iSys < 9; iSys++) {
+    for (int iPt = 0; iPt < 5; iPt++) {
+      h_csv_wgt_hf[iSys][iPt] = NULL;
+      c_csv_wgt_hf[iSys][iPt] = NULL;
     }
-    for (int iSys = 0; iSys < 5; iSys++) {
-        for (int iPt = 0; iPt < 5; iPt++)
-            c_csv_wgt_hf[iSys][iPt] = NULL;
+    for (int iPt = 0; iPt < 4; iPt++) {
+      for (int iEta = 0; iEta < 3; iEta++) h_csv_wgt_lf[iSys][iPt][iEta] = NULL;
     }
-
-    // CSV reweighting /// only care about the nominal ones
-    for (int iSys = 0; iSys < 9; iSys++) {
-        TString syst_csv_suffix_hf = "final";
-        TString syst_csv_suffix_c = "final";
-        TString syst_csv_suffix_lf = "final";
+  }
+  
+  // CSV reweighting /// only care about the nominal ones
+  for (int iSys = 0; iSys < 9; iSys++) {
+    TString syst_csv_suffix_hf = "final";
+    TString syst_csv_suffix_c  = "final";
+    TString syst_csv_suffix_lf = "final";
 
         switch (iSys) {
             case 0:
@@ -118,7 +115,7 @@ CSVHelper::fillCSVHistos(TFile *fileHF, TFile *fileLF)
 
         if (iSys < 5) {
             for (int iPt = 0; iPt < nHFptBins; iPt++)
-                c_csv_wgt_hf[iSys][iPt] =
+	      c_csv_wgt_hf[iSys][iPt] =
                     (TH1D *)fileHF->Get(Form("c_csv_ratio_Pt%i_Eta0_%s", iPt, syst_csv_suffix_c.Data()));
         }
 
@@ -219,69 +216,60 @@ CSVHelper::getCSVWeight(cat::JetCollection jets, int iSys)//, double &csvWgtHF, 
     }
 
     double csvWgthf = 1.;
-    double csvWgtC = 1.;
+    double csvWgtC  = 1.;
     double csvWgtlf = 1.;
 
     for (auto jet1 = jets.begin(), end = jets.end(); jet1 != end; ++jet1){
-    //for (int iJet = 0; iJet < int(jetPts.size()); iJet++) {
-    //    double csv = jetCSVs[iJet];
-    //    double jetPt = jetPts[iJet];
-    //    double jetAbsEta = fabs(jetEtas[iJet]);
-    //    int flavor = jetFlavors[iJet];
-        double csv = jet1->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
-        double jetPt = jet1->p4().pt();
-        double jetAbsEta = std::fabs(jet1->p4().eta());
-        int flavor = jet1->hadronFlavour();
+      double csv = jet1->bDiscriminator(cat::BTAG_CSVv2);
+      double jetPt = jet1->p4().pt();
+      double jetAbsEta = std::fabs(jet1->p4().eta());
+      int flavor = jet1->hadronFlavour();
+      
+      int iPt  = -1;
+      int iEta = -1;
+      if      (jetPt >=19.99 && jetPt<30 ) iPt = 0;
+      else if (jetPt >=30    && jetPt<50 ) iPt = 1;
+      else if (jetPt >=50    && jetPt<70 ) iPt = 2;
+      else if (jetPt >=70    && jetPt<100) iPt = 3;
+      else if (jetPt >=100)                iPt = 4;
+            
+      if      (jetAbsEta >= 0   && jetAbsEta < 0.8 ) iEta = 0;
+      else if (jetAbsEta >= 0.8 && jetAbsEta < 1.6 ) iEta = 1;
+      else if (jetAbsEta >= 1.6 && jetAbsEta < 2.41) iEta = 2;
 
-        //std::cout << "pt:" << jetPt << ", abseta:" << jetAbsEta <<", csv:" << csv << ", flavor" << flavor << std::endl;
-        int iPt = -1;
-        int iEta = -1;
-        if      (jetPt >=19.99 && jetPt<30 ) iPt = 0;
-        else if (jetPt >=30    && jetPt<40 ) iPt = 1;
-        else if (jetPt >=40    && jetPt<60 ) iPt = 2;
-        else if (jetPt >=60    && jetPt<100) iPt = 3;
-        else if (jetPt >=100   && jetPt<160) iPt = 4;
-        else if (jetPt >= 160)               iPt = 5;
+      if (iPt < 0 || iEta < 0)
+	std::cout << "Error, couldn't find Pt, Eta bins for this b-flavor jet, jetPt = " << jetPt
+		  << ", jetAbsEta = " << jetAbsEta << std::endl;
+      
+      if (abs(flavor) == 5) {
+	int useCSVBin = (csv >= 0.) ? h_csv_wgt_hf[iSysHF][iPt]->FindBin(csv) : 1;
+	double iCSVWgtHF = h_csv_wgt_hf[iSysHF][iPt]->GetBinContent(useCSVBin);
+	if (iCSVWgtHF != 0)
+	  csvWgthf *= iCSVWgtHF;	
+      }
+      else if (abs(flavor) == 4) {
+	int useCSVBin = (csv >= 0.) ? c_csv_wgt_hf[iSysC][iPt]->FindBin(csv) : 1;
+	double iCSVWgtC = c_csv_wgt_hf[iSysC][iPt]->GetBinContent(useCSVBin);
+	if (iCSVWgtC != 0)
+	  csvWgtC *= iCSVWgtC;
+      }
+      else {
 
-        if      (jetAbsEta >= 0   && jetAbsEta < 0.8 ) iEta = 0;
-        else if (jetAbsEta >= 0.8 && jetAbsEta < 1.6 ) iEta = 1;
-        else if (jetAbsEta >= 1.6 && jetAbsEta < 2.41) iEta = 2;
+	if      (jetPt >=19.99 && jetPt<30 ) iPt = 0;
+	else if (jetPt >=30    && jetPt<40 ) iPt = 1;
+	else if (jetPt >=40    && jetPt<60 ) iPt = 2;
+	else if (jetPt >=60)                 iPt = 3;
+	
+	int useCSVBin = (csv >= 0.) ? h_csv_wgt_lf[iSysLF][iPt][iEta]->FindBin(csv) : 1;
+	double iCSVWgtLF = h_csv_wgt_lf[iSysLF][iPt][iEta]->GetBinContent(useCSVBin);
+	if (iCSVWgtLF != 0)
+	  csvWgtlf *= iCSVWgtLF;
+      }
 
-        if (iPt < 0 || iEta < 0)
-            std::cout << "Error, couldn't find Pt, Eta bins for this b-flavor jet, jetPt = " << jetPt
-                      << ", jetAbsEta = " << jetAbsEta << std::endl;
-
-       if (abs(flavor) == 5) {
-	    // RESET iPt to maximum pt bin (only 5 bins for new SFs)
-	    if(iPt>=nHFptBins){
-		iPt=nHFptBins-1;
-	    }
-            int useCSVBin = (csv >= 0.) ? h_csv_wgt_hf[iSysHF][iPt]->FindBin(csv) : 1;
-            double iCSVWgtHF = h_csv_wgt_hf[iSysHF][iPt]->GetBinContent(useCSVBin);
-            if (iCSVWgtHF != 0)
-                csvWgthf *= iCSVWgtHF;
-
-        } else if (abs(flavor) == 4) {
-	    // RESET iPt to maximum pt bin (only 5 bins for new SFs)
-	    if(iPt>=nHFptBins){
-		iPt=nHFptBins-1;
-	    }
-            int useCSVBin = (csv >= 0.) ? c_csv_wgt_hf[iSysC][iPt]->FindBin(csv) : 1;
-            double iCSVWgtC = c_csv_wgt_hf[iSysC][iPt]->GetBinContent(useCSVBin);
-            if (iCSVWgtC != 0)
-                csvWgtC *= iCSVWgtC;
-        } else {
-            if (iPt >= 3)
-                iPt = 3; /// [30-40], [40-60] and [60-10000] only 3 Pt bins for lf
-            int useCSVBin = (csv >= 0.) ? h_csv_wgt_lf[iSysLF][iPt][iEta]->FindBin(csv) : 1;
-            double iCSVWgtLF = h_csv_wgt_lf[iSysLF][iPt][iEta]->GetBinContent(useCSVBin);
-            if (iCSVWgtLF != 0)
-                csvWgtlf *= iCSVWgtLF;
-        }
     }
-
+    
     double csvWgtTotal = csvWgthf * csvWgtC * csvWgtlf;
-
+    
     //csvWgtHF = csvWgthf;
     //csvWgtLF = csvWgtlf;
     //csvWgtCF = csvWgtC;
