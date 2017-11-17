@@ -85,6 +85,7 @@ private:
   edm::EDGetTokenT<std::vector<float>>           pdfWeightToken_;
   edm::EDGetTokenT<std::vector<float>>           scaleUpWeightToken_;
   edm::EDGetTokenT<std::vector<float>>           scaleDownWeightToken_;
+  edm::EDGetTokenT<cat::GenWeights>              hdampWeightToken_;
   edm::EDGetTokenT<float>                        puWeightToken_;
   edm::EDGetTokenT<float>                        puUpWeightToken_;
   edm::EDGetTokenT<float>                        puDownWeightToken_;
@@ -122,6 +123,7 @@ private:
   float b_GenWeight;
   std::vector<float> *b_ScaleWeight;
   std::vector<float> *b_PDFWeight;
+  std::vector<float> *b_hdampWeight;
   // PU/Vertices
   std::vector<float> *b_PUWeight;
   int b_nGoodPV;
@@ -300,6 +302,8 @@ ttbbLepJetsAnalyzer::ttbbLepJetsAnalyzer(const edm::ParameterSet& iConfig):
   // Scale
   scaleUpWeightToken_   = consumes<std::vector<float>>(edm::InputTag(genWeightLabel.label(), "scaleup"));
   scaleDownWeightToken_ = consumes<std::vector<float>>(edm::InputTag(genWeightLabel.label(), "scaledown"));
+  // hdamp
+  hdampWeightToken_       = consumes<cat::GenWeights>(edm::InputTag("genWeight"));
   // PileUp
   auto puWeightLabel = iConfig.getParameter<edm::InputTag>("puWeightLabel");
   puWeightToken_         = consumes<float>             (edm::InputTag(puWeightLabel.label()));
@@ -330,6 +334,7 @@ ttbbLepJetsAnalyzer::ttbbLepJetsAnalyzer(const edm::ParameterSet& iConfig):
   b_PUWeight     = new std::vector<float>;
   b_PDFWeight    = new std::vector<float>;  
   b_ScaleWeight  = new std::vector<float>;  
+  b_hdampWeight  = new std::vector<float>;  
   b_Lepton_SF    = new std::vector<float>;  
 
   b_GenConeCatID      = new std::vector<int>;
@@ -468,6 +473,7 @@ ttbbLepJetsAnalyzer::ttbbLepJetsAnalyzer(const edm::ParameterSet& iConfig):
   if(TTbarMC_ == 1){
     tree->Branch("pdfweight",   "std::vector<float>", &b_PDFWeight );
     tree->Branch("scaleweight", "std::vector<float>", &b_ScaleWeight );
+    tree->Branch("hdampweight", "std::vector<float>", &b_hdampWeight );
 
     tree->Branch("jet_MatchedGenJetIndex", "std::vector<int>",  &b_Jet_MatchedGenJetIndex);
 
@@ -559,6 +565,7 @@ ttbbLepJetsAnalyzer::~ttbbLepJetsAnalyzer()
    // (e.g. close files, deallocate resources etc.)
   delete b_PUWeight;
   delete b_PDFWeight;
+  delete b_hdampWeight;
   delete b_ScaleWeight;
 
   delete b_GenConeCatID;
@@ -634,6 +641,7 @@ void ttbbLepJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetu
   b_PUWeight   ->clear();
   b_ScaleWeight->clear();
   b_PDFWeight  ->clear();
+  b_hdampWeight->clear();
 
   b_GenConeCatID->clear();
   b_GenCone_gJet_pT->clear();
@@ -769,24 +777,36 @@ void ttbbLepJetsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetu
     iEvent.getByToken(scaleDownWeightToken_, scaleDownWeightsHandle);
 
     // muR/muF Scale Weights
-    b_ScaleWeight->push_back(scaleUpWeightsHandle  ->at(0)); // muR=Nom  muF=Up
-    b_ScaleWeight->push_back(scaleDownWeightsHandle->at(0)); // muR=Nom  muF=Down
-    b_ScaleWeight->push_back(scaleUpWeightsHandle  ->at(1)); // muR=Up   muF=Nom
-    b_ScaleWeight->push_back(scaleUpWeightsHandle  ->at(2)); // muR=Up   muF=Up
-    b_ScaleWeight->push_back(scaleDownWeightsHandle->at(1)); // muR=Down muF=Nom
-    b_ScaleWeight->push_back(scaleDownWeightsHandle->at(2)); // muR=Down muF=Down
-    
+    if(scaleUpWeightsHandle->size()!=0 && scaleDownWeightsHandle->size()!=0){
+      b_ScaleWeight->push_back(scaleUpWeightsHandle  ->at(0)); // muR=Nom  muF=Up
+      b_ScaleWeight->push_back(scaleDownWeightsHandle->at(0)); // muR=Nom  muF=Down
+      b_ScaleWeight->push_back(scaleUpWeightsHandle  ->at(1)); // muR=Up   muF=Nom
+      b_ScaleWeight->push_back(scaleUpWeightsHandle  ->at(2)); // muR=Up   muF=Up
+      b_ScaleWeight->push_back(scaleDownWeightsHandle->at(1)); // muR=Down muF=Nom
+      b_ScaleWeight->push_back(scaleDownWeightsHandle->at(2)); // muR=Down muF=Down
+
+      std::cout << "vecfloat:ScaleWeight = " << scaleUpWeightsHandle  ->at(2) << std::endl;
+
+    }
     // Sum of muR/muF Scale Weights
     for(unsigned int iscale = 0; iscale< b_ScaleWeight->size(); iscale++)
       ScaleWeights->Fill(iscale, b_ScaleWeight->at(iscale)); 
 
+    // PDF Weights
     edm::Handle<std::vector<float>> PDFWeightsHandle;
     iEvent.getByToken(pdfWeightToken_,   PDFWeightsHandle);
 
     for ( auto& w : *PDFWeightsHandle ) b_PDFWeight->push_back(w);
 
+    // hdamp: Only for ttbar. hdamp weights start at 227
+    edm::Handle<cat::GenWeights> hdampWeightsHandle;
+    iEvent.getByToken(hdampWeightToken_,   hdampWeightsHandle);
+    if (hdampWeightsHandle->weights().size()>=254){
+      for(int ihdamp=227; ihdamp<254; ihdamp++) b_hdampWeight->push_back(hdampWeightsHandle->weights().at(ihdamp)); 
+    }
+    
   }
-
+  
   //---------------------------------------------------------------------------
   //---------------------------------------------------------------------------
   // Generated Particles (For Pythia8)

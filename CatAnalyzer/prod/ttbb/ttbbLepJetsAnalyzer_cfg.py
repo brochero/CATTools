@@ -30,7 +30,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 50000
 # )
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 
 process.source = cms.Source("PoolSource",
 
@@ -38,8 +38,9 @@ process.source = cms.Source("PoolSource",
      fileNames = cms.untracked.vstring(
         #'file:/afs/cern.ch/user/b/brochero/brochero_WorkArea/CATTuples_2017/CMSSW_8_0_20/src/CATTools/CatAnalyzer/prod/catTuple_ttbarLepJetsPowhegv803.root',
         #'root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/v8-0-4_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/170113_045423/0000/catTuple_1.root',
+        #'root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8/v8-0-6_RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/170303_104621/0000/catTuple_5.root'
         'root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/v8-0-6_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/170303_104856/0000/catTuple_106.root',
-        #'root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/SingleElectron/v8-0-3_Run2016E-23Sep2016-v1/161207_134721/0000/catTuple_1.root'
+        #'root://cms-xrdr.sdfarm.kr:1094///xrd/store/user/brochero/ttbb_4FS_OpenLoops_13TeV-sherpa/ttbbDedicatedOpenLoops_For_ttbb_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/171027_111115/0000/catTuple_5.root'
         )
 )
 # from CATTools.Validation.commonTestInput_cff import commonTestCATTuples
@@ -103,9 +104,9 @@ process.ttbbLepJets = cms.EDAnalyzer('ttbbLepJetsAnalyzer',
                                      JetMother         = cms.InputTag("genJetHadronFlavour:ancestors"),
                                      )
 
-process.ttbbLepJetsQCD = process.ttbbLepJets.clone(
-    doLooseLepton = cms.untracked.bool(True),
-)
+# process.ttbbLepJetsQCD = process.ttbbLepJets.clone(
+#     doLooseLepton = cms.untracked.bool(True),
+# )
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string('Tree_ttbbLepJets.root')
@@ -120,4 +121,4 @@ process.TFileService = cms.Service("TFileService",
 process.p = cms.Path(process.flatGenWeights +
                      process.csvWeights +
                      process.pileupWeight +
-                     process.ttbbLepJets + process.ttbbLepJetsQCD)
+                     process.ttbbLepJets)# + process.ttbbLepJetsQCD)
