@@ -1526,7 +1526,8 @@ bool ttbbAnalyzer::IsSelectElectron(const cat::Electron & i_electron_candidate)
 
   // Electron cut based selection
   // From https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2
-  GoodElectron &= i_electron_candidate.electronID("cutBasedElectronID-Summer16-80X-V1-medium") > 0.0;
+  // GoodElectron &= i_electron_candidate.electronID("cutBasedElectronID-Summer16-80X-V1-medium") > 0.0;
+  GoodElectron &= i_electron_candidate.electronID("cutBasedElectronID-Summer16-80X-V1-tight") > 0.0;
   
   // Electron MVA selection (Tight: WP80)
   // From https://twiki.cern.ch/twiki/bin/viewauth/CMS/MultivariateElectronIdentificationRun2#Recipes_for_7_4_12_Spring15_MVA
