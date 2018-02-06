@@ -3,8 +3,10 @@ import FWCore.ParameterSet.Config as cms
 catEventContent = cms.untracked.vstring()
 catEventContentMC = cms.untracked.vstring()
 catEventContentRD = cms.untracked.vstring()
+catEventContentMCSignal = cms.untracked.vstring()
 catEventContentTOPMC = cms.untracked.vstring()
 catEventContentSecVertexs = cms.untracked.vstring()
+catEventContentTOPParticleLevel = cms.untracked.vstring()
 
 catEventContent.extend([
     'drop *',
@@ -25,7 +27,7 @@ catEventContent.extend([
     'keep patPackedTriggerPrescales_patTrigger__*', ## do we need this collection, where?
     'keep *_lumiMask*_*_*',
     'keep *_fixedGridRhoAll_*_', 'keep *_fixedGridRhoFastjetAll_*_*',
-    'keep *_BadChargedCandidateFilter_*_*', 'keep *_BadPFMuonFilter_*_*',
+    #'keep *_BadChargedCandidateFilter_*_*', 'keep *_BadPFMuonFilter_*_*',
     ])
 
 catEventContentRD.extend([
@@ -33,22 +35,30 @@ catEventContentRD.extend([
     ])
 
 catEventContentMC.extend([
-    'keep recoGenParticles_prunedGenParticles_*_*',
-    'keep *_slimmedGenJets_*_*',
     'keep *_genWeight_*_*',
     'keep *_pileupWeight*_*_*',
+    ])
+
+catEventContentMCSignal.extend([
+    'keep *_slimmedGenJets_*_*',
+    'keep recoGenParticles_prunedGenParticles_*_*',
     #'keep *_matchGenBHadron_*_*',
     #'keep *_matchGenCHadron_*_*',
     ])
 
 catEventContentTOPMC.extend([
-    'keep *_GenTtbarCategories_*_*',
     'keep *_GenTtbarCategories*_*_*',
     'keep *_catGenTops_*_*',
-    #'keep *_partonTop_*_*', ## Can be built on the fly from prunedGenParticles
-    'keep *_pseudoTop_*_*',
     'keep *_genJetHadronFlavour_*_*',
-    ])
+])
+
+catEventContentTOPParticleLevel.extend([
+    #'keep *_partonTop_*_*', ## Can be built on the fly from prunedGenParticles
+    'keep *_particleLevel_*_*',
+    'drop *_particleLevel_consts_*',
+    'drop *_particleLevel_photons_*',
+    'drop *_particleLevel_fatjets_*',
+])
 
 catEventContentSecVertexs.extend([
     'keep *_catSecVertexs_*_*',
